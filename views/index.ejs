@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Car Auction</title>
+    <link rel="stylesheet" href="/css/auction.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Car Auction</h1>
+        
+        <div class="car-card">
+            <img src="<%= car.image %>" alt="<%= car.name %>" class="car-image">
+            
+            <div class="car-info">
+                <h2><%= car.name %></h2>
+                <p><%= car.description %></p>
+                <p class="price">Current Price: $<span id="price"><%= car.price %></span></p>
+                
+                <form id="bidForm" onsubmit="return placeBid(event)">
+                    <div class="bid-input-group">
+                        <input type="number" id="bidAmount" min="<%= car.price + 1 %>" placeholder="Enter bid amount">
+                        <button type="submit" id="bidButton">Place Bid</button>
+                    </div>
+                    <div id="bidMessage" class="message"></div>
+                </form>
+
+                <div class="bid-history">
+                    <h3>Bid History</h3>
+                    <div id="bidsList" class="bids-list">
+                        <% car.bids.forEach(bid => { %>
+                            <div class="bid-item">
+                                <span class="bidder"><%= bid.bidder %></span>
+                                <span class="amount">$<%= bid.amount %></span>
+                            </div>
+                        <% }); %>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+        let currentPrice = <%= car.price %>;
+        let isBidding = false;
+
+        function showMessage(message, isError = false) {
+            const messageDiv = document.getElementById('bidMessage');
+            messageDiv.textContent = message;
+            messageDiv.className = `message ${isError ? 'error' : 'success'}`;
+            setTimeout(() => {
+                messageDiv.textContent = '';
+                messageDiv.className = 'message';
+            }, 3000);
+        }
+
+        function placeBid(event) {
+            event.preventDefault();
+            
+            if (isBidding) return false;
+            
+            const bidAmount = parseFloat(document.getElementById('bidAmount').value);
+            const bidButton = document.getElementById('bidButton');
+            
+            if (bidAmount <= currentPrice) {
+                showMessage('Bid must be higher than current price!', true);
+                return false;
+            }
+
+            isBidding = true;
+            bidButton.disabled = true;
+            bidButton.textContent = 'Placing Bid...';
+
+            socket.emit('placeBid', {
+                amount: bidAmount,
+                bidder: 'User ' + Math.floor(Math.random() * 1000)
+            });
+
+            document.getElementById('bidAmount').value = '';
+            return false;
+        }
+
+        socket.on('bidUpdate', function(data) {
+            // Update current price
+            currentPrice = data.price;
+            
+            // Update price display with animation
+            const priceElement = document.getElementById('price');
+            priceElement.textContent = data.price;
+            priceElement.classList.add('price-update');
+            
+            // Update minimum bid amount
+            document.getElementById('bidAmount').min = data.price + 1;
+            
+            // Add to bid history
+            const bidsList = document.getElementById('bidsList');
+            const newBid = document.createElement('div');
+            newBid.className = 'bid-item new-bid';
+            newBid.innerHTML = `
+                <span class="bidder">${data.bidder}</span>
+                <span class="amount">$${data.price}</span>
+            `;
+            bidsList.insertBefore(newBid, bidsList.firstChild);
+
+            // Reset bid button
+            const bidButton = document.getElementById('bidButton');
+            bidButton.disabled = false;
+            bidButton.textContent = 'Place Bid';
+            isBidding = false;
+
+            // Show success message
+            showMessage('Bid placed successfully!');
+
+            // Remove animations after delay
+            setTimeout(() => {
+                priceElement.classList.remove('price-update');
+                newBid.classList.remove('new-bid');
+            }, 1000);
+        });
+
+        // Handle connection status
+        socket.on('connect', () => {
+            showMessage('Connected to auction server');
+        });
+
+        socket.on('disconnect', () => {
+            showMessage('Disconnected from server. Trying to reconnect...', true);
+        });
+    </script>
+</body>
+</html> 

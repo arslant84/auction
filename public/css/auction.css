@@ -1,0 +1,198 @@
+body {
+    font-family: Arial, sans-serif;
+    background: #f0f2f5;
+    margin: 0;
+    padding: 20px;
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+h1 {
+    text-align: center;
+    color: #1a73e8;
+    margin-bottom: 30px;
+    font-size: 2.5em;
+}
+
+.car-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+.car-image {
+    width: 100%;
+    height: 300px;
+    object-fit: cover;
+}
+
+.car-info {
+    padding: 25px;
+}
+
+h2 {
+    color: #1a73e8;
+    margin-bottom: 10px;
+    font-size: 1.8em;
+}
+
+.price {
+    font-size: 1.4em;
+    font-weight: bold;
+    color: #1a73e8;
+    margin: 15px 0;
+}
+
+.bid-input-group {
+    display: flex;
+    gap: 10px;
+    margin: 20px 0;
+}
+
+input {
+    flex: 1;
+    padding: 12px;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    font-size: 1em;
+    transition: border-color 0.3s;
+}
+
+input:focus {
+    outline: none;
+    border-color: #1a73e8;
+}
+
+button {
+    background: #1a73e8;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background 0.3s;
+}
+
+button:hover:not(:disabled) {
+    background: #1557b0;
+}
+
+button:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
+.message {
+    margin: 10px 0;
+    padding: 10px;
+    border-radius: 4px;
+    text-align: center;
+    display: none;
+}
+
+.message:not(:empty) {
+    display: block;
+}
+
+.message.success {
+    background: #e6f4ea;
+    color: #1e8e3e;
+}
+
+.message.error {
+    background: #fce8e6;
+    color: #d93025;
+}
+
+.bid-history {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+}
+
+.bid-history h3 {
+    color: #1a73e8;
+    margin-bottom: 15px;
+    font-size: 1.3em;
+}
+
+.bids-list {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.bid-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px;
+    border-bottom: 1px solid #eee;
+    transition: background 0.3s;
+}
+
+.bid-item:last-child {
+    border-bottom: none;
+}
+
+.bid-item.new-bid {
+    background: #e6f4ea;
+    animation: slideIn 0.5s ease;
+}
+
+.bidder {
+    color: #1a73e8;
+    font-weight: 500;
+}
+
+.amount {
+    font-weight: bold;
+    color: #1e8e3e;
+}
+
+.price-update {
+    animation: pricePulse 0.5s ease;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes pricePulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+@media (max-width: 600px) {
+    body {
+        padding: 10px;
+    }
+    
+    .car-image {
+        height: 200px;
+    }
+    
+    .car-info {
+        padding: 15px;
+    }
+    
+    .bid-input-group {
+        flex-direction: column;
+    }
+    
+    button {
+        width: 100%;
+    }
+} 
